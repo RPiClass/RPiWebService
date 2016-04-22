@@ -16,11 +16,11 @@ class RootWS():
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def temp(self):
-		from sense_hat import SenseHat """ import the sense HAT library """
-		sense = SenseHat() """ setup a handle for the library """
-		temp = sense.get_temperature() """ get the current temp and store it in the 'temp' verable """
-        return {'timestamp': str(datetime.utcnow()), 'temp': str(temp)}
+    def temperature(self):
+		from sense_hat import SenseHat 
+		sense = SenseHat() 
+		temp = sense.get_temperature() 
+        return {'timestamp': str(datetime.utcnow()), 'temperature': str(temp)}
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
