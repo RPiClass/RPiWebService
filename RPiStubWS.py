@@ -13,7 +13,8 @@ class RootWS():
     @cherrypy.tools.json_out()
     def index(self):
 	    return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
-    
+
+#temperature needs F
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def temperature(self):
@@ -21,14 +22,28 @@ class RootWS():
 		sense = SenseHat() 
 		temp = sense.get_temperature() 
         return {'timestamp': str(datetime.utcnow()), 'temperature': str(temp)}
-    
+
+#humidity    
+
+
+#magnetrometer
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def mag(self):
         x = str(random.randint(0,999))
         y = str(random.randint(0,999))
         return {'timestamp': str(datetime.utcnow()), 'x': str(x), 'y': str(y)}
-        
+
+#orientation_radius
+
+#camera
+
+#pressure
+
+#need altitude sensor
+
+#video (is this a gopro)
+
 def start_server():
     cherrypy.tree.mount(RootWS(), '/')
     cherrypy.config.update({'server.socket_port': 9090})
