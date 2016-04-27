@@ -2,22 +2,25 @@ import json
 import cherrypy
 from cherrypy import tools
 import random
+from datetime import datetime
 
 @cherrypy.tools.json_out()
 def error_page_404(status, message, traceback, version):
-    return {"Error":"404"}
+    return {'timestamp': str(datetime.utcnow()), "Error":"404"}
 
 class RootWS():
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def index(self):
-        return {'index': "Hi There"}
+        return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
     
+    #temperature
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def temp(self):
-        """ Return the current temp as an integer between 32 and 145 """
-        return {'temp': str(random.randint(32,145))}
+    def temperature(self):
+        """ Return the current temperature as an random integer between 32 and 145 """
+        return {'timestamp': str(datetime.utcnow()), 'temperature':  str(random.randint(32,145))}
+
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
