@@ -39,7 +39,7 @@ class RootWS():
     @cherrypy.tools.json_out()
     def temperature(self):
         """ Return the temperature as an random integer between 32 and 145 """
-        return {'timestamp': str(datetime.utcnow()), 'temperature':   str(sense.get_temperature_from_humidity())}
+        return {'timestamp': str(datetime.utcnow()), 'temperature':   str(sense.get_temperature_from_humidity()*9/5+32)}
 
     #humidity
     @cherrypy.expose
