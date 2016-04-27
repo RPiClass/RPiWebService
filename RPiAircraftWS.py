@@ -2,49 +2,81 @@ import json
 import cherrypy
 from cherrypy import tools
 import random
-from sense_hat import SenseHat
 from datetime import datetime
+from sense_hat import SenseHat
 
 sense = SenseHat()
 
 @cherrypy.tools.json_out()
 def error_page_404(status, message, traceback, version):
-    return {"Error":"404"}
+    return {'timestamp': str(datetime.utcnow()), "Error":"404"}
 
 class RootWS():
     @cherrypy.expose
-    @cherrypy.tools.json_out()
+    #@cherrypy.tools.json_out()
     def index(self):
-        return {"index": "hello world"}
+        #return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
+        #return file("index.html")
+        return """<html>
+<head>
+        <title>CherryPy static example</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css" type="text/css"></link>
+        <script type="application/javascript" src="js/some.js"></script>
+</head>
+<body>
+<p>Static example</p>
+<a id="shutdown"; href="./shutdown">Shutdown Server</a>
+</body>
+</html>"""
     
+    @cherrypy.expose
+    def shutdown(self):  
+        cherrypy.engine.exit()
+    
+    
+    #temperature
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def temperature(self):
-        __doc__ = """ Return the current temp  """
-        return {'time': str(datetime.utcnow()), 'temperature': str(sense.get_temperature_from_humidity())}
+        """ Return the temperature as an random integer between 32 and 145 """
+        return {'timestamp': str(datetime.utcnow()), 'temperature':   str(sense.get_temperature_from_humidity())}
 
+    #humidity
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def humidity(self):
+        """ Return the humidity as an RANDOM integer between 0 and 100 - this value is a percentage """
+        return {'timestamp': str(datetime.utcnow()), 'humidity':  str(random.randint(0,100))}
+
+    #pressure
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def pressure(self):
-        __doc__ = """ Return pressure in millibars"""
-        return {'time': str(datetime.utcnow()), 'pressure': str(sense.get_pressure())}
+        """ Return a RANDOM value of 979 - 1027 to represent millibars  """
+        return {'timestamp': str(datetime.utcnow()), 'pressure':  str(sense.get_pressure())}
     
+    
+    #orientation
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def orientation_rad(self):
-        __doc__ = """ Return orientation in degrees using aircraft principles axes of pitch, roll and yaw."""
-        return {'time': str(datetime.utcnow()), 'orientation_rad': str(sense.get_orientation_radians())}
+    def orientation(self):
+        """ Return 3 RANDOM values representing Pitch, Roll, Yaw in Degrees  """
+        return {'timestamp': str(datetime.utcnow()), 'orientation': str(sense.get_orientation_radians())}
     
+
+    
+    #magnetometer
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def mag(self):
-        __doc__ = """ Return the current reading of the Magnetometer"""
-        return {'time': str(datetime.utcnow()), 'mag': str(sense.get_compass_raw())}
+        """ Return the current reading of the Magnetometer as an integer between 32 and 145 """
+        return {'compass': str(sense.get_compass_raw())}
         
 def start_server():
     cherrypy.tree.mount(RootWS(), '/')
-    cherrypy.config.update({'server.socket_port': 9090, 'server.socket_host': '0.0.0.0'})
+    cherrypy.config.update({'server.socket_port': 9100})
     cherrypy.engine.start()
 
+    
 if __name__ == '__main__':
     start_server()
