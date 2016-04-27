@@ -2,48 +2,31 @@ import json
 import cherrypy
 from cherrypy import tools
 import random
-from datetime import datetime
 
 @cherrypy.tools.json_out()
 def error_page_404(status, message, traceback, version):
-    return {'timestamp': str(datetime.utcnow()), "Error":"404"}
+    return {"Error":"404"}
 
 class RootWS():
-	@cherrypy.expose
-    @cherrypy.tools.json_out()
-    def index(self):
-	    return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
-
-#temperature needs F
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def temperature(self):
-		from sense_hat import SenseHat 
-		sense = SenseHat() 
-		temp = sense.get_temperature() 
-        return {'timestamp': str(datetime.utcnow()), 'temperature': str(temp)}
-
-#humidity    
-
-
-#magnetrometer
+    def index(self):
+        return {'index': "Hi There"}
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def temp(self):
+        """ Return the current temp as an integer between 32 and 145 """
+        return {'temp': str(random.randint(32,145))}
+    
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def mag(self):
+        """ Return the current reading of the Magnetometer as an integer between 32 and 145 """
         x = str(random.randint(0,999))
         y = str(random.randint(0,999))
-        return {'timestamp': str(datetime.utcnow()), 'x': str(x), 'y': str(y)}
-
-#orientation_radius
-
-#camera
-
-#pressure
-
-#need altitude sensor
-
-#video (is this a gopro)
-
+        return {'x': str(x), 'y': str(y)}
+        
 def start_server():
     cherrypy.tree.mount(RootWS(), '/')
     cherrypy.config.update({'server.socket_port': 9090})
