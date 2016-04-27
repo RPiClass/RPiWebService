@@ -10,17 +10,58 @@ def error_page_404(status, message, traceback, version):
 
 class RootWS():
     @cherrypy.expose
-    @cherrypy.tools.json_out()
+    #@cherrypy.tools.json_out()
     def index(self):
-        return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
+        #return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
+        #return file("index.html")
+        return """<html>
+<head>
+        <title>CherryPy static example</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css" type="text/css"></link>
+        <script type="application/javascript" src="js/some.js"></script>
+</head>
+<body>
+<p>Static example</p>
+<a id="shutdown"; href="./shutdown">Shutdown Server</a>
+</body>
+</html>"""
+    
+    @cherrypy.expose
+    def shutdown(self):  
+        cherrypy.engine.exit()
+    
     
     #temperature
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def temperature(self):
-        """ Return the current temperature as an random integer between 32 and 145 """
+        """ Return the temperature as an random integer between 32 and 145 """
         return {'timestamp': str(datetime.utcnow()), 'temperature':  str(random.randint(32,145))}
 
+    #humidity
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def humidity(self):
+        """ Return the humidity as an RANDOM integer between 0 and 100 - this value is a percentage """
+        return {'timestamp': str(datetime.utcnow()), 'humidity':  str(random.randint(0,100))}
+
+    #pressure
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def pressure(self):
+        """ Return a RANDOM value of 979 - 1027 to represent millibars  """
+        return {'timestamp': str(datetime.utcnow()), 'pressure':  str(random.randint(979,1027))}
+    
+    
+    #orientation
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def orientation(self):
+        """ Return 3 RANDOM values representing Pitch, Roll, Yaw in Degrees  """
+        return {'timestamp': str(datetime.utcnow()), 'orientation pitch': str(random.randint(0,360)), 'orientation roll':  str(random.randint(0,360)), 'orientation yaw': str(random.randint(0,360))}
+    
+
+    
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -32,8 +73,9 @@ class RootWS():
         
 def start_server():
     cherrypy.tree.mount(RootWS(), '/')
-    cherrypy.config.update({'server.socket_port': 9090})
+    cherrypy.config.update({'server.socket_port': 9098})
     cherrypy.engine.start()
 
+    
 if __name__ == '__main__':
     start_server()
