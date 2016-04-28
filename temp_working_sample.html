@@ -1,0 +1,73 @@
+<html>
+  <head>
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+   <script src='compass.js'></script>
+   <script type="text/javascript">
+   /*
+   
+   Gyroscope
+   Accelerometer
+   Magnetometer
+   Temperature
+   Barometric pressure
+   Humidity
+   
+   */
+   
+      google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+      
+      var new_temp = '';
+      
+      function getRemoteTemperature(){
+	  var rpiAPI = "http://127.0.0.1:9090/temp?tempResp=?";
+	  $.ajax({
+		    url: rpiAPI,
+		    dataType: "jsonp",
+		    jsonpCallback: 'tempResp',
+		    success: function(temp_data) {
+		        console.log("Temperature: " + temp_data.Temperature);
+		        new_temp = temp_data.Temperature
+		    }
+		}); // end ajax
+      } // end getRemoteTemperature
+      
+      function drawChart(){
+
+        var data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Temperature', 2]
+        ]);
+
+        var options = {
+          width: 400, height: 120,
+          redFrom: 90, redTo: 100,
+          yellowFrom:75, yellowTo: 90,
+          minorTicks: 5
+        };
+
+        var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+
+        setInterval(function() {
+
+        	getRemoteTemperature()
+	        data.setValue(0, 1, new_temp);
+	        chart.draw(data, options);
+          
+        }, 130); // end setInterval
+      
+      }//end drawChart
+      
+    </script>
+  </head>
+  <body onload='init();'>
+    <div id="chart_div" style="width: 400px; height: 120px;"></div>
+    <br />
+    <br />
+    <br />
+    <br />
+  </body>
+</html>
