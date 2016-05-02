@@ -4,6 +4,9 @@ from cherrypy import tools
 import random
 from datetime import datetime
 from sense_hat import SenseHat
+import time
+import os
+import glob
 
 sense = SenseHat()
 
@@ -18,16 +21,22 @@ class RootWS():
         #return {'timestamp': str(datetime.utcnow()), 'index': "Hi There"}
         #return file("index.html")
         return """<html>
-<head>
-        <title>CherryPy static example</title>
-        <link rel="stylesheet" type="text/css" href="css/style.css" type="text/css"></link>
-        <script type="application/javascript" src="js/some.js"></script>
-</head>
-<body>
-<p>Static example</p>
-<a id="shutdown"; href="./shutdown">Shutdown Server</a>
-</body>
+            <head>
+                <title>CherryPy static example</title>
+                <link rel="stylesheet" type="text/css" href="css/style.css" type="text/css"></link>
+                <script type="application/javascript" src="js/some.js"></script>
+            </head>
+            <body>
+                <p>Static example</p>
+		<a id="record"; href="./record">Start Image Recording!</a><br><br>
+                <a id="shutdown"; href="./shutdown">Shutdown Server</a><br><br><br>
+                 
+                <img src='data:image/jpeg,%s' width="800" height="400" />
+                
+            </body>
 </html>"""
+
+
     
     @cherrypy.expose
     def shutdown(self):  
@@ -64,19 +73,38 @@ class RootWS():
         return {'timestamp': str(datetime.utcnow()), 'orientation': str(sense.get_orientation_radians())}
     
 
-    
     #magnetometer
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def mag(self):
         """ Return the current reading of the Magnetometer as an integer between 32 and 145 """
         return {'compass': str(sense.get_compass_raw())}
-        
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def record(self):
+	from subprocess import call
+	call([ "raspistill", "-n", "-o", "/home/pi/media/a%04d.jpg", "-tl", "1000", "-t", "600000", "-w", "640", "-h", "480"])
+        return "Recording Started" 
+
+    @cherrypy.expose
+    def image(self):
+        #imgfolder=os.path("/home/pi/media/")
+        #filelist = os.listdir(imgfolder)
+        #filelist = filter(lambda x: not os.path.isdir(x), filelist)
+        #newest = max(filelist, key=lambda x: os.stat(x).st_mtime)
+        newest=max(glob.iglob('/home/pi/media/*.jpg'), key=os.path.getctime)
+        #return {'newest file': newest()}
+        return newest
+
 def start_server():
-    cherrypy.tree.mount(RootWS(), '/')
+    cherrypy.tree.mount(RootWS(), '/', config=conf)
     cherrypy.config.update({'server.socket_port': 9100})
     cherrypy.engine.start()
 
+conf = {'/media': {'tools.staticdir.on': True,
+        'tools.staticdir.dir': '/home/pi/media'}}
+print conf
     
 if __name__ == '__main__':
     start_server()
