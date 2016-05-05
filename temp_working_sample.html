@@ -21,7 +21,7 @@
       var new_temp = '';
       
       function getRemoteTemperature(){
-	  var rpiAPI = "http://127.0.0.1:9090/temp?tempResp=?";
+	  var rpiAPI = "http://192.168.1.43:9090/temp?tempResp=?";
 	  $.ajax({
 		    url: rpiAPI,
 		    dataType: "jsonp",
@@ -70,7 +70,7 @@
 
             function clickHandler() {
                 var script_elem = document.createElement('script'),
-                    url = "http://127.0.0.1:9090/release?releaseResp=?"
+                    url = "http://192.168.1.43:9090/release?releaseResp=?"
                 script_elem.setAttribute('src', url);
                 document.head.appendChild(script_elem);
             }
