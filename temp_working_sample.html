@@ -1,5 +1,4 @@
-<html>
-  <head>
+d>
    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
    <script src='compass.js'></script>
@@ -62,12 +61,28 @@
       }//end drawChart
       
     </script>
+    
+    <script type="text/javascript">
+            function callMe(data) {
+                document.write(data.SessionKey)
+            }
+
+            function clickHandler() {
+                var script_elem = document.createElement('script'),
+                    url = "http://127.0.0.1:9090/release?releaseResp=?"
+                script_elem.setAttribute('src', url);
+                document.head.appendChild(script_elem);
+            }
+
+            document.getElementById('btn').addEventListener('click', clickHandler, false);
+        </script>
   </head>
   <body onload='init();'>
     <div id="chart_div" style="width: 400px; height: 120px;"></div>
     <br />
     <br />
     <br />
+    <button id="btn">Click</button>
     <br />
   </body>
 </html>
