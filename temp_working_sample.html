@@ -21,7 +21,7 @@
       var new_temp = '';
       
       function getRemoteTemperature(){
-	  var rpiAPI = "http://192.168.1.43:9090/temp?tempResp=?";
+	  var rpiAPI = "/temp?tempResp=?";
 	  $.ajax({
 		    url: rpiAPI,
 		    dataType: "jsonp",
@@ -57,33 +57,35 @@
 	        data.setValue(0, 1, new_temp);
 	        chart.draw(data, options);
           
-        }, 130); // end setInterval
+        }, 5000); // end setInterval
       
       }//end drawChart
       
     </script>
     
-    <script type="text/javascript">
-            function callMe(data) {
-                document.write(data.SessionKey)
-            }
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#btn").click(function(){
 
-            function clickHandler() {
-                var script_elem = document.createElement('script'),
-                    url = "http://192.168.1.43:9090/release?releaseResp=?"
-                script_elem.setAttribute('src', url);
-                document.head.appendChild(script_elem);
-            }
+            $.ajax({
+                type: 'GET',
+                url: '/release?releaseResp=releaseResp&_=Foo',
+                success: function(data) {
+                    $("#btn").text(data.releaseResp);
 
-            document.getElementById('btn').addEventListener('click', clickHandler, false);
-        </script>
+                }
+            });
+   });
+});
+</script>
+
   </head>
-  <body onload='init();'>
+  <body>
     <div id="chart_div" style="width: 400px; height: 120px;"></div>
     <br />
     <br />
     <br />
-    <button id="btn">Click</button>
+    <button id="btn">Drop</button>
     <br />
   </body>
 </html>

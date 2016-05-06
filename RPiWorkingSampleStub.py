@@ -2,6 +2,10 @@ import json
 import cherrypy
 from cherrypy import tools
 import random
+import time
+import serial
+import string
+from pynmea import nmea
 
 @cherrypy.tools.json_out()
 def error_page_404(status, message, traceback, version):
@@ -9,9 +13,12 @@ def error_page_404(status, message, traceback, version):
 
 class RootWS():
     @cherrypy.expose
-    @cherrypy.tools.json_out()
     def index(self):
-        return {'index': "Hi There"}
+	return open('temp_working_sample.html')
+
+    @cherrypy.expose
+    def foo1(self):
+	return open('/home/pi/Documents/altitude/index.html')
     
     @cherrypy.expose
     def release(self,releaseResp=None,_=None):
@@ -28,7 +35,27 @@ class RootWS():
             p.stop()
         except:
             pass
-        return 'releaseResp({"Release": "True"});'
+        return 'releaseResp({"releaseResp": "Dropped!"});'
+
+    @cherrypy.expose
+    def getAltitude(self,altResp=None,_=None):
+	ser = serial.Serial()
+	ser.port = "/dev/ttyAMA0"
+	ser.baudrate = 9600
+	ser.timeout = 10.0
+	ser.open()
+	gpgga = nmea.GPGGA()
+	CURRENT_ALT = None
+	while True:
+	    data = ser.readline()
+	    if data[0:6] == '$GPGGA':
+	        gpgga.parse(data)
+	        global CURRENT_ALT 
+		CURRENT_ALT= gpgga.antenna_altitude
+		if CURRENT_ALT:
+			break
+
+	return 'altResp({"Altitude" : "' + str(CURRENT_ALT).replace(u'\xb0',"") + '"};)'
     
     @cherrypy.expose
     def temp(self,tempResp=None,_=None):
